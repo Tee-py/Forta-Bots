@@ -1,74 +1,75 @@
+import { BigNumber } from "ethers";
 import {
   FindingType,
   FindingSeverity,
   Finding,
   HandleTransaction,
   createTransactionEvent,
-  ethers,
+  TransactionEvent,
 } from "forta-agent";
-// import agent, {
-//   ERC20_TRANSFER_EVENT,
-//   TETHER_ADDRESS,
-//   TETHER_DECIMALS,
-// } from "./agent";
+import { TestTransactionEvent } from "forta-agent-tools/lib/tests";
+import agent, {
+  FORTA_DEPLOY_CONTRACT,
+  CREATE_AGENT_FUNCTION_SIGNATURE,
+  NETHERMIND_DEPLOYER_ADDRESS,
+} from "./agent";
 
-// describe("high tether transfer agent", () => {
-//   let handleTransaction: HandleTransaction;
-//   const mockTxEvent = createTransactionEvent({} as any);
+const TEST_TX_DATA =
+  "0x7935d5b4d95c28bb11ef69b285bfdc96a12024f64f98c1440262383d57977424117a68a500000000000000000000000088dc3a2284fa62e0027d6d6b1fcfdd2141a143b8000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000002e516d506b796447726d534b32726f554a654e7a73644333653759657472377a6237554e646d69587952554d3669370000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000a86a";
 
-//   beforeAll(() => {
-//     handleTransaction = agent.handleTransaction;
-//   });
+describe("New Forta Agent Deployment Bot", () => {
+  let handleTransaction: HandleTransaction;
 
-//   describe("handleTransaction", () => {
-//     it("returns empty findings if there are no Tether transfers", async () => {
-//       mockTxEvent.filterLog = jest.fn().mockReturnValue([]);
+  beforeAll(() => {
+    handleTransaction = agent.handleTransaction;
+  });
 
-//       const findings = await handleTransaction(mockTxEvent);
+  describe("handleTransaction", () => {
+    it("returns empty findings if there are no Bot Deployments", async () => {
+      const mockTxEvent = new TestTransactionEvent();
+      mockTxEvent.filterFunction = jest.fn().mockReturnValue([]);
+      const findings = await handleTransaction(mockTxEvent);
 
-//       expect(findings).toStrictEqual([]);
-//       expect(mockTxEvent.filterLog).toHaveBeenCalledTimes(1);
-//       expect(mockTxEvent.filterLog).toHaveBeenCalledWith(
-//         ERC20_TRANSFER_EVENT,
-//         TETHER_ADDRESS
-//       );
-//     });
+      expect(findings).toStrictEqual([]);
+      expect(mockTxEvent.filterFunction).toHaveBeenCalledTimes(1);
+      expect(mockTxEvent.filterFunction).toHaveBeenCalledWith(
+        CREATE_AGENT_FUNCTION_SIGNATURE,
+        FORTA_DEPLOY_CONTRACT
+      );
+    });
 
-//     it("returns a finding if there is a Tether transfer over 10,000", async () => {
-//       const mockTetherTransferEvent = {
-//         args: {
-//           from: "0xabc",
-//           to: "0xdef",
-//           value: ethers.BigNumber.from("20000000000"), //20k with 6 decimals
-//         },
-//       };
-//       mockTxEvent.filterLog = jest
-//         .fn()
-//         .mockReturnValue([mockTetherTransferEvent]);
+    it("returns a finding when there's a bot deployment from Nethermind To Forta", async () => {
+      const mockTxEvent: TransactionEvent = new TestTransactionEvent()
+        .setFrom(NETHERMIND_DEPLOYER_ADDRESS)
+        .setTo(FORTA_DEPLOY_CONTRACT)
+        .setData(TEST_TX_DATA);
+      const findings = await handleTransaction(mockTxEvent);
+      const findingObject = {
+        name: "New agent",
+        description: "Bot Deployed By Nethermind",
+        alertId: "NETHERMIND-1",
+        protocol: "NETHERMIND",
+        severity: FindingSeverity.Info,
+        type: FindingType.Info,
+        metadata: {
+          metadata: "QmPkydGrmSK2roUJeNzsdC3e7Yetr7zb7UNdmiXyRUM6i7",
+        },
+      };
+      expect(findings).toStrictEqual([Finding.fromObject(findingObject)]);
+    });
 
-//       const findings = await handleTransaction(mockTxEvent);
-
-//       const normalizedValue = mockTetherTransferEvent.args.value.div(
-//         10 ** TETHER_DECIMALS
-//       );
-//       expect(findings).toStrictEqual([
-//         Finding.fromObject({
-//           name: "High Tether Transfer",
-//           description: `High amount of USDT transferred: ${normalizedValue}`,
-//           alertId: "FORTA-1",
-//           severity: FindingSeverity.Low,
-//           type: FindingType.Info,
-//           metadata: {
-//             to: mockTetherTransferEvent.args.to,
-//             from: mockTetherTransferEvent.args.from,
-//           },
-//         }),
-//       ]);
-//       expect(mockTxEvent.filterLog).toHaveBeenCalledTimes(1);
-//       expect(mockTxEvent.filterLog).toHaveBeenCalledWith(
-//         ERC20_TRANSFER_EVENT,
-//         TETHER_ADDRESS
-//       );
-//     });
-//   });
-// });
+    it("Returns Empty Findings When Deployer Is Not NetherMind", async () => {
+      const mockTxEvent: TransactionEvent = new TestTransactionEvent()
+        .setFrom("0x435")
+        .setTo("0x3456");
+      mockTxEvent.filterFunction = jest.fn().mockReturnValue([]);
+      const findings = await handleTransaction(mockTxEvent);
+      expect(findings).toStrictEqual([]);
+      expect(mockTxEvent.filterFunction).toHaveBeenCalledTimes(1);
+      expect(mockTxEvent.filterFunction).toHaveBeenCalledWith(
+        CREATE_AGENT_FUNCTION_SIGNATURE,
+        FORTA_DEPLOY_CONTRACT
+      );
+    });
+  });
+});

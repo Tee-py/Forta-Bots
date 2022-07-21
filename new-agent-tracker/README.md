@@ -8,18 +8,15 @@ This agent detects when there's a new agent deployed on FORTA-NETWORK.
 
 - POLYGON
 
-<!-- ## Alerts
+## Alerts
 
 Describe each of the type of alerts fired by this agent
 
-- FORTA-1
-  - Fired when a transaction contains a Tether transfer over 10,000 USDT
-  - Severity is always set to "low" (mention any conditions where it could be something else)
-  - Type is always set to "info" (mention any conditions where it could be something else)
-  - Mention any other type of metadata fields included with this alert -->
+- NETHERMIND-1
+  - Fired when a new Bot is Deployed By Nethermind Forta Deployer.
 
-<!-- ## Test Block
+## Test Transaction
 
-Currently Running The Bot Against Block :
+Run The Bot Against Transaction :
 
-- 0x3a0f757030beec55c22cbc545dd8a844cbbb2e6019461769e1bc3f3a95d10826 (15,000 USDT) -->
+- 0x4dec9fa58239302b0f289be3629c18f08dd3fab9b9b309d6c6372b5f9b2287c1
