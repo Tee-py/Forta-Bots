@@ -19,4 +19,4 @@ Describe each of the type of alerts fired by this agent
 
 Run The Bot Against Transaction :
 
-- 0x4dec9fa58239302b0f289be3629c18f08dd3fab9b9b309d6c6372b5f9b2287c1
+- 0x7b3a2acef6aa72c80eaf036357e11f2ee5931f2eea8b546421e5ea18b299b4ee

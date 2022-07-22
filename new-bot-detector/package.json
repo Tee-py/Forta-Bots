@@ -1,9 +1,8 @@
 {
-  "name": "forta-agent-starter",
+  "name": "",
   "version": "0.0.1",
   "description": "Forta Agent Typescript starter project",
   "chainIds": [
-    1,
     137
   ],
   "scripts": {
@@ -25,8 +24,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "forta-agent": "^0.1.9",
-    "forta-agent-tools": "^2.3.1"
+    "forta-agent": "^0.1.9"
   },
   "devDependencies": {
     "@types/jest": "^27.0.1",
