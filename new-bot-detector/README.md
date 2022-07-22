@@ -2,7 +2,7 @@
 
 ## Description
 
-This agent detects when there's a new agent deployed on FORTA-NETWORK.
+This Bot Detects when there's a new bot deployed by Nethermind Deployer Address.
 
 ## Supported Chains
 
@@ -10,10 +10,15 @@ This agent detects when there's a new agent deployed on FORTA-NETWORK.
 
 ## Alerts
 
-Describe each of the type of alerts fired by this agent
-
 - NETHERMIND-1
-  - Fired when a new Bot is Deployed By Nethermind Forta Deployer.
+  - Fired when `createAgent` function is called on Forta Contract.
+  - Severity is always set to "Info".
+  - Type is always set to "Info".
+  - Metadata contains:
+    - `metadata`: deployed bot metadata.
+    - `agentId`: bot agentid.
+    - `owner`: bot deployer.
+    - `chainIds`: supported chains of the bot.
 
 ## Test Transaction
 
