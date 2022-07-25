@@ -1,9 +1,10 @@
-import { FindingType, FindingSeverity, Finding, HandleTransaction, TransactionEvent } from "forta-agent";
+import { HandleTransaction, TransactionEvent } from "forta-agent";
 import { TestTransactionEvent } from "forta-agent-tools/lib/tests";
 import { Interface } from "ethers/lib/utils";
 import { FORTA_DEPLOY_CONTRACT, CREATE_AGENT_FUNCTION_SIGNATURE, NETHERMIND_DEPLOYER_ADDRESS } from "./constants";
 import { provideTransactionHandler } from "./agent";
 import { BigNumber } from "ethers";
+import { createFinding } from "./utils";
 
 const FORTA_INTERFACE = new Interface([CREATE_AGENT_FUNCTION_SIGNATURE]);
 const TEST_DATA = {
@@ -42,22 +43,15 @@ describe("New Forta Agent Deployment Bot", () => {
           ]),
         });
       const findings = await handleTransaction(mockTxEvent);
-      const findingObject = {
-        name: "New agent",
-        description: "Bot Deployed By Nethermind",
-        alertId: "NETHERMIND-1",
-        protocol: "NETHERMIND",
-        severity: FindingSeverity.Info,
-        type: FindingType.Info,
-        metadata: {
-          agentId: TEST_DATA.agentId,
-          owner: TEST_DATA.owner,
-          metadata: TEST_DATA.metadata,
-          chainIds: TEST_DATA.chainIds,
-        },
-      };
+      const expectedFinding = createFinding(
+        TEST_DATA.agentId,
+        TEST_DATA.metadata,
+        TEST_DATA.chainIds,
+        TEST_DATA.owner,
+        "NETHERMIND-1"
+      );
       expect(findings.length).toStrictEqual(1);
-      expect(findings[0].metadata).toStrictEqual(findingObject.metadata);
+      expect(findings).toStrictEqual([expectedFinding]);
     });
 
     it("Returns Empty Findings When Deployer Is Not NetherMind", async () => {
