@@ -1,9 +1,9 @@
-import { LogDescription, TransactionDescription } from "ethers/lib/utils";
+import { TransactionDescription } from "ethers/lib/utils";
 import { Finding, HandleTransaction, TransactionEvent, FindingSeverity, FindingType } from "forta-agent";
 
 import { CREATE_AGENT_FUNCTION_SIGNATURE, FORTA_DEPLOY_CONTRACT, NETHERMIND_DEPLOYER_ADDRESS } from "./constants";
 
-function provideTransactionHandler(deployer: string, forta_contract: string): HandleTransaction {
+export function provideTransactionHandler(deployer: string, forta_contract: string): HandleTransaction {
   return async (txEvent: TransactionEvent): Promise<Finding[]> => {
     const findings: Finding[] = [];
     const createAgentFunctionCalls = txEvent.filterFunction(CREATE_AGENT_FUNCTION_SIGNATURE, forta_contract);
