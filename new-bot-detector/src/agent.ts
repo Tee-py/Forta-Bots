@@ -6,9 +6,12 @@ import { CREATE_AGENT_FUNCTION_SIGNATURE, FORTA_DEPLOY_CONTRACT, NETHERMIND_DEPL
 export function provideTransactionHandler(deployer: string, forta_contract: string): HandleTransaction {
   return async (txEvent: TransactionEvent): Promise<Finding[]> => {
     const findings: Finding[] = [];
+    if (txEvent.from != deployer.toLowerCase()) {
+      return findings;
+    }
     const createAgentFunctionCalls = txEvent.filterFunction(CREATE_AGENT_FUNCTION_SIGNATURE, forta_contract);
     createAgentFunctionCalls.forEach((call: TransactionDescription) => {
-      if (txEvent.from == deployer.toLocaleLowerCase()) {
+      if (txEvent.from == deployer.toLowerCase()) {
         const [agentId, owner, metadata, chainIds] = call.args;
         const findingObject = {
           name: "New Bot",
