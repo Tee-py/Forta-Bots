@@ -1,7 +1,7 @@
 {
   "name": "bot-detector-challenge",
   "version": "0.0.1",
-  "description": "Forta Bot That Detects New Bot Deployment Through Nethermind Deployer",
+  "description": "Forta bot that detects new bot deployment through nethermind deployer",
   "repository": "https://github.com/Tee-py/Forta-Bots/blob/main/new-agent-tracker/",
   "chainIds": [
     137
