@@ -1,8 +1,10 @@
 import { Result } from "ethers/lib/utils"
-import { providers } from "ethers";
+import { providers, ethers } from "ethers";
+import { POOL_ABI } from "./constants";
 import { Finding, FindingSeverity, FindingType } from "forta-agent"
 import { computePoolAddress, FeeAmount } from "@uniswap/v3-sdk";
 import { Token } from "@uniswap/sdk-core";
+import LRU from "lru-cache";
 
 type MetaData = {
     [key: string]: string
@@ -34,9 +36,15 @@ export const feeToFeeAmount = (fee: string): FeeAmount => {
     return FeeAmount.LOW;
 }
 
-export const isUniSwapPool = async (factoryAddress: string, pairAddress: string, token0: string, token1: string, fee: FeeAmount): Promise<boolean> => {
+export const isUniSwapPool = async (factoryAddress: string, pairAddress: string, poolCache: LRU<string, boolean>, provider: ethers.providers.JsonRpcProvider): Promise<boolean> => {
+    if (poolCache.has(pairAddress)) return poolCache.get(pairAddress) as Promise<boolean>;
+    const poolContract = new ethers.Contract(pairAddress, POOL_ABI, provider);
+    const [token0, token1, fee] = await Promise.all([poolContract.token0(), poolContract.token1(), poolContract.fee()]);
     let tokenA = new Token(1234, token0, 18);
     let tokenB = new Token(1234, token1, 18);
-    const poolAddress = await computePoolAddress({factoryAddress, tokenA, tokenB, fee});
-    return poolAddress.toLowerCase() == pairAddress.toLowerCase();
+    let feeAmount = feeToFeeAmount(fee.toString());
+    const poolAddress = await computePoolAddress({factoryAddress, tokenA, tokenB, fee: feeAmount});
+    const result = (poolAddress.toLowerCase() == pairAddress.toLowerCase());
+    poolCache.set(pairAddress, result);
+    return result
 }
