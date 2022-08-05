@@ -1,5 +1,5 @@
 import { Result } from "ethers/lib/utils"
-import { providers, ethers } from "ethers";
+import { ethers } from "ethers";
 import { UNISWAP_V3_POOL_ABI } from "./constants";
 import { Finding, FindingSeverity, FindingType } from "forta-agent"
 import { computePoolAddress, FeeAmount } from "@uniswap/v3-sdk";
@@ -29,10 +29,10 @@ export const createSwapMetaData = (eventArgs: Result, poolAddress: string): Meta
 }
 
 export const feeToFeeAmount = (fee: string): FeeAmount => {
-    if (fee == "100") return FeeAmount.LOWEST;
-    if (fee == "500") return FeeAmount.LOW;
-    if (fee == "3000") return FeeAmount.MEDIUM;
-    if (fee == "10000") return FeeAmount.HIGH;
+    if (fee === "100") return FeeAmount.LOWEST;
+    if (fee === "500") return FeeAmount.LOW;
+    if (fee === "3000") return FeeAmount.MEDIUM;
+    if (fee === "10000") return FeeAmount.HIGH;
     return FeeAmount.LOW;
 }
 
@@ -44,7 +44,7 @@ export const isUniSwapPool = async (factoryAddress: string, pairAddress: string,
     let tokenB = new Token(1234, token1, 18);
     let feeAmount = feeToFeeAmount(fee.toString());
     const poolAddress = await computePoolAddress({factoryAddress, tokenA, tokenB, fee: feeAmount});
-    const result = (poolAddress.toLowerCase() == pairAddress.toLowerCase());
+    const result = (poolAddress.toLowerCase() === pairAddress.toLowerCase());
     poolCache.set(pairAddress, result);
     return result
 }
