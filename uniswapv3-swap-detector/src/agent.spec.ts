@@ -32,7 +32,6 @@ describe("UNISWAP BOT TEST", () => {
         handleTransaction = provideTransactionHandler(FACTORY_ADDRESS, provider, poolCache);
     })
 
-    describe("Handle Transaction Test", () => {
         it("Returns nothing if there's no swap event", async () => {
             const mockTxEvent = new TestTransactionEvent();
             const findings = await handleTransaction(mockTxEvent);
@@ -67,6 +66,5 @@ describe("UNISWAP BOT TEST", () => {
             const findings = await handleTransaction(mockTxEvent);
             expect([]).toStrictEqual(findings);
         })
-    })
 
 })
