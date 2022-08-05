@@ -14,7 +14,7 @@ type MetaData = {
 export const createSwapFinding = (metadata: MetaData): Finding => {
     return Finding.fromObject({
         name: "New UniswapV3 swap",
-        description: "Swapped detected",
+        description: `New Swap detected from UNISWAP-V3 POOL ${metadata.poolAddress}`,
         alertId: "V3-SWAP",
         protocol: "NETHERMIND",
         severity: FindingSeverity.Info,
