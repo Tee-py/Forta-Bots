@@ -1,6 +1,6 @@
 import { Result } from "ethers/lib/utils"
 import { providers, ethers } from "ethers";
-import { POOL_ABI } from "./constants";
+import { UNISWAP_V3_POOL_ABI } from "./constants";
 import { Finding, FindingSeverity, FindingType } from "forta-agent"
 import { computePoolAddress, FeeAmount } from "@uniswap/v3-sdk";
 import { Token } from "@uniswap/sdk-core";
@@ -14,7 +14,7 @@ type MetaData = {
 export const createSwapFinding = (metadata: MetaData): Finding => {
     return Finding.fromObject({
         name: "New UniswapV3 swap",
-        description: "Swapped blablabla",
+        description: "Swapped detected",
         alertId: "V3-SWAP",
         protocol: "NETHERMIND",
         severity: FindingSeverity.Info,
@@ -23,9 +23,9 @@ export const createSwapFinding = (metadata: MetaData): Finding => {
       })
 }
 
-export const createSwapMetaData = (eventArgs: Result): MetaData  => {
+export const createSwapMetaData = (eventArgs: Result, poolAddress: string): MetaData  => {
     const [ sender, recipient, amount0, amount1, , , ] = eventArgs;
-    return { sender, recipient, amountIn: amount0.toString(), amountOut: amount1.abs().toString()}
+    return { poolAddress, sender, recipient, amountIn: amount0.abs().toString(), amountOut: amount1.abs().toString()}
 }
 
 export const feeToFeeAmount = (fee: string): FeeAmount => {
@@ -38,7 +38,7 @@ export const feeToFeeAmount = (fee: string): FeeAmount => {
 
 export const isUniSwapPool = async (factoryAddress: string, pairAddress: string, poolCache: LRU<string, boolean>, provider: ethers.providers.JsonRpcProvider): Promise<boolean> => {
     if (poolCache.has(pairAddress)) return poolCache.get(pairAddress) as Promise<boolean>;
-    const poolContract = new ethers.Contract(pairAddress, POOL_ABI, provider);
+    const poolContract = new ethers.Contract(pairAddress, UNISWAP_V3_POOL_ABI, provider);
     const [token0, token1, fee] = await Promise.all([poolContract.token0(), poolContract.token1(), poolContract.fee()]);
     let tokenA = new Token(1234, token0, 18);
     let tokenB = new Token(1234, token1, 18);
