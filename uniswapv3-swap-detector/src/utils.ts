@@ -41,14 +41,17 @@ export const isUniSwapPool = async (
   poolCache: LRU<string, boolean>,
   provider: ethers.providers.JsonRpcProvider
 ): Promise<boolean> => {
+  // checks if pairAddress exists in uniswap Pool cache
   if (poolCache.has(pairAddress)) return poolCache.get(pairAddress) as Promise<boolean>;
+  // Gets the pool info e.g (token0, token1, fee) from the pool contract
   const poolContract = new ethers.Contract(pairAddress, UNISWAP_V3_POOL_ABI, provider);
   const [token0, token1, fee] = await Promise.all([poolContract.token0(), poolContract.token1(), poolContract.fee()]);
   let tokenA = new Token(1234, token0, 18);
   let tokenB = new Token(1234, token1, 18);
   let feeAmount = feeToFeeAmount(fee.toString());
+  // calculates the pair address using create2 and compares the calculated address with the pairAddress
   const poolAddress = await computePoolAddress({ factoryAddress, tokenA, tokenB, fee: feeAmount });
   const result = poolAddress.toLowerCase() === pairAddress.toLowerCase();
-  poolCache.set(pairAddress, result);
+  poolCache.set(pairAddress, result); // updates the pool cache with the result of the computation
   return result;
 };
