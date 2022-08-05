@@ -1,7 +1,8 @@
 {
-  "name": "forta-agent-starter",
+  "name": "uniswap-v3-pool-swap-detector",
   "version": "0.0.1",
-  "description": "Forta Agent Typescript starter project",
+  "description": "Forta bot that detects swap made on uniswap-v3 pools.",
+  "repository": "https://github.com/Tee-py/Forta-Bots/blob/main/uniswapv3-swap-detector/",
   "chainIds": [
     1
   ],
@@ -21,7 +22,8 @@
     "disable": "forta-agent disable",
     "enable": "forta-agent enable",
     "keyfile": "forta-agent keyfile",
-    "test": "jest"
+    "test": "jest",
+    "format": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
     "@uniswap/sdk-core": "^3.0.1",
@@ -32,6 +34,7 @@
   "devDependencies": {
     "@types/jest": "^27.0.1",
     "@types/nodemon": "^1.19.0",
+    "forta-agent-tools": "^3.0.0",
     "jest": "^27.0.6",
     "nodemon": "^2.0.8",
     "ts-jest": "^27.0.3",
