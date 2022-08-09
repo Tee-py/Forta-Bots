@@ -1,4 +1,3 @@
-import { JsonRpcProvider } from "@ethersproject/providers";
 import { ethers, Finding, getEthersProvider, HandleTransaction, TransactionEvent } from "forta-agent";
 import { UNISWAP_V3_POOL_ABI, V3_FACTORY_CONTRACT_ADDRESS } from "./constants";
 import { createSwapFinding, createSwapMetaData, isUniSwapPool, uniSwapPoolCache } from "./utils";
@@ -16,9 +15,9 @@ export function provideTransactionHandler(
       const pairAddress = swapEvent["address"];
       let isValidPool;
       try {
-        isValidPool = await isUniSwapPool(factoryAddress, pairAddress, cache, provider);
+        const block = await provider.getBlockNumber();
+        isValidPool = await isUniSwapPool(factoryAddress, pairAddress, cache, provider, block);
       } catch (error) {
-        console.log(error)
         return [];
       }
 

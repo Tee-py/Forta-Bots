@@ -1,5 +1,5 @@
 import { defaultAbiCoder, getCreate2Address, Result, solidityKeccak256 } from "ethers/lib/utils";
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import { INIT_CODE_HASH, UNISWAP_V3_POOL_ABI } from "./constants";
 import { Finding, FindingSeverity, FindingType } from "forta-agent";
 import LRU from "lru-cache";
@@ -39,15 +39,18 @@ export const isUniSwapPool = async (
   factoryAddress: string,
   pairAddress: string,
   poolCache: LRU<string, boolean>,
-  provider: ethers.providers.Provider
+  provider: ethers.providers.Provider,
+  block: number
 ): Promise<boolean> => {
   // checks if pairAddress exists in uniswap Pool cache
   if (poolCache.has(pairAddress)) return poolCache.get(pairAddress) as Promise<boolean>;
   // Gets the pool info e.g (token0, token1, fee) from the pool contract
   const poolContract = new ethers.Contract(pairAddress, UNISWAP_V3_POOL_ABI, provider);
-  console.log(`Got Here --> ${pairAddress}`)
-  const [token0, token1, fee] = await Promise.all([poolContract.token0(), poolContract.token1(), poolContract.fee()]);
-  console.log("After")
+  const [token0, token1, fee] = await Promise.all([
+    poolContract.token0({ blockTag: block }),
+    poolContract.token1({ blockTag: block }),
+    poolContract.fee({ blockTag: block }),
+  ]);
   // calculates the pair address using create2 and compares the calculated address with the pairAddress
   const poolAddress = computePoolAddress(factoryAddress, token0, token1, fee.toString());
   const result = poolAddress.toLowerCase() === pairAddress.toLowerCase();

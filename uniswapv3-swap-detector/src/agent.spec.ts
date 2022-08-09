@@ -29,11 +29,15 @@ describe("UNISWAP BOT TEST", () => {
   let mockProvider: MockEthersProvider;
   let Ipool: utils.Interface;
 
-  const setPool = (poolAddress: string, token0: string, token1: string, fee: string) => {
-    mockProvider.addCallTo(poolAddress, 0, Ipool, "token0", { inputs: [], outputs: [token0]});
-    mockProvider.addCallTo(poolAddress, 0, Ipool, "token1", {inputs: [], outputs: [token1]});
-    mockProvider.addCallTo(poolAddress, 0, Ipool, "fee", { inputs: [], outputs: [BigNumber.from(fee)]});
-  }
+  const setPool = (poolAddress: string, token0: string, token1: string, fee: string, block: number) => {
+    mockProvider.addCallTo(poolAddress, block, Ipool, "token0", { inputs: [], outputs: [token0] });
+    mockProvider.addCallTo(poolAddress, block, Ipool, "token1", { inputs: [], outputs: [token1] });
+    mockProvider.addCallTo(poolAddress, block, Ipool, "fee", { inputs: [], outputs: [BigNumber.from(fee)] });
+  };
+
+  const setProviderBlock = (block: number) => {
+    mockProvider.setLatestBlock(block);
+  };
 
   beforeEach(() => {
     poolCache = new LRU<string, boolean>({ max: 500 });
@@ -47,10 +51,10 @@ describe("UNISWAP BOT TEST", () => {
     const mockTxEvent = new TestTransactionEvent();
     const findings = await handleTransaction(mockTxEvent);
     expect(findings).toStrictEqual([]);
+    expect(mockProvider.call).toBeCalledTimes(0);
   });
 
   it("Returns finding if there's a swap event on uniswap v3 pool and pool Cache works", async () => {
-    
     const mockTxEvent = new TestTransactionEvent()
       .setFrom(TEST_DATA.from)
       .setTo(TEST_DATA.to)
@@ -64,8 +68,9 @@ describe("UNISWAP BOT TEST", () => {
         TEST_DATA.liquidity,
         TEST_DATA.tick,
       ]);
-    
-    setPool(TEST_DATA.poolAddress, TEST_DATA.token0, TEST_DATA.token1, TEST_DATA.fee);
+
+    setPool(TEST_DATA.poolAddress, TEST_DATA.token0, TEST_DATA.token1, TEST_DATA.fee, 0);
+    setProviderBlock(0);
     const findings = await handleTransaction(mockTxEvent);
     const expectedFinding = createSwapFinding({
       poolAddress: TEST_DATA.poolAddress,
@@ -76,10 +81,12 @@ describe("UNISWAP BOT TEST", () => {
     });
     expect([expectedFinding]).toStrictEqual(findings);
     expect(poolCache.has(TEST_DATA.poolAddress)).toStrictEqual(true);
+    expect(mockProvider.call).toBeCalledTimes(3);
   });
 
   it("Returns empty finding if swap is not a valid pool", async () => {
-    setPool("0x45c54210128a065de780C4B0Df3d16664f7f859e", TEST_DATA.token0, TEST_DATA.token1, TEST_DATA.fee);
+    setPool("0x45c54210128a065de780C4B0Df3d16664f7f859e", TEST_DATA.token0, TEST_DATA.token1, TEST_DATA.fee, 0);
+    setProviderBlock(0);
     const mockTxEvent = new TestTransactionEvent()
       .setFrom(TEST_DATA.from)
       .setTo(TEST_DATA.to)
@@ -95,9 +102,11 @@ describe("UNISWAP BOT TEST", () => {
       .setBlock(0);
     const findings = await handleTransaction(mockTxEvent);
     expect([]).toStrictEqual(findings);
+    expect(mockProvider.call).toBeCalledTimes(3);
   });
 
   it("Returns empty finding on other events", async () => {
+    setProviderBlock(0);
     const mockTxEvent = new TestTransactionEvent()
       .setFrom(TEST_DATA.from)
       .setTo(TEST_DATA.to)
@@ -107,5 +116,6 @@ describe("UNISWAP BOT TEST", () => {
       .setBlock(0);
     const findings = await handleTransaction(mockTxEvent);
     expect([]).toStrictEqual(findings);
+    expect(mockProvider.call).toBeCalledTimes(0);
   });
 });
