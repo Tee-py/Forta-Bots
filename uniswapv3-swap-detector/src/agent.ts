@@ -1,12 +1,12 @@
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { Finding, getJsonRpcUrl, HandleTransaction, TransactionEvent } from "forta-agent";
+import { ethers, Finding, getEthersProvider, HandleTransaction, TransactionEvent } from "forta-agent";
 import { UNISWAP_V3_POOL_ABI, V3_FACTORY_CONTRACT_ADDRESS } from "./constants";
-import { createSwapFinding, createSwapMetaData, isUniSwapPool } from "./utils";
+import { createSwapFinding, createSwapMetaData, isUniSwapPool, uniSwapPoolCache } from "./utils";
 import LRU from "lru-cache";
 
 export function provideTransactionHandler(
   factoryAddress: string,
-  provider: JsonRpcProvider,
+  provider: ethers.providers.Provider,
   cache: LRU<string, boolean>
 ): HandleTransaction {
   return async (txEvent: TransactionEvent): Promise<Finding[]> => {
@@ -18,6 +18,7 @@ export function provideTransactionHandler(
       try {
         isValidPool = await isUniSwapPool(factoryAddress, pairAddress, cache, provider);
       } catch (error) {
+        console.log(error)
         return [];
       }
 
@@ -30,9 +31,6 @@ export function provideTransactionHandler(
   };
 }
 
-const provider = new JsonRpcProvider(getJsonRpcUrl());
-const uniSwapPoolCache = new LRU<string, boolean>({ max: 500 });
-
 export default {
-  handleTransaction: provideTransactionHandler(V3_FACTORY_CONTRACT_ADDRESS, provider, uniSwapPoolCache),
+  handleTransaction: provideTransactionHandler(V3_FACTORY_CONTRACT_ADDRESS, getEthersProvider(), uniSwapPoolCache),
 };
