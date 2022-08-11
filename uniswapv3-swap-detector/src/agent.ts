@@ -15,7 +15,7 @@ export function provideTransactionHandler(
       const pairAddress = swapEvent["address"];
       let isValidPool;
       try {
-        const block = await provider.getBlockNumber();
+        const block = txEvent.blockNumber;
         isValidPool = await isUniSwapPool(factoryAddress, pairAddress, cache, provider, block);
       } catch (error) {
         return [];

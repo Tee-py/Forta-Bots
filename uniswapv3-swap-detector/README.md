@@ -4,7 +4,7 @@
 
 ## Description
 
-This agent detects swaps made on uniswap-v3 pools without keeping a list of uniswap pools.
+This bot detects swaps made on uniswap-v3 pools without keeping a list of uniswap pools.
 
 ## Supported Chains
 
@@ -14,9 +14,14 @@ This agent detects swaps made on uniswap-v3 pools without keeping a list of unis
 
 - V3-SWAP
   - Fired when there's a new swap on uniswap-v3 pool.
-  - Severity is always set to "info".
-  - Type is always set to "info".
+  - Severity is always set to "Info".
+  - Type is always set to "Info".
   - Metadata contains `sender`, `recipient`, `amountIn`, `amountOut` and `poolAddress`.
+    - sender: The smart contract caller.
+    - recipient: The receiver of the swapped tokens.
+    - amountIn: The amount of token swapped.
+    - amountOut: The amount of token received.
+    - poolAddress: The address of the smart contract (uniswapv3 pool).
 
 ## Test Data
 

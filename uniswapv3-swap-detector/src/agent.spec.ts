@@ -1,17 +1,18 @@
 import { HandleTransaction } from "forta-agent";
 import { provideTransactionHandler } from "./agent";
 import { MockEthersProvider, TestTransactionEvent } from "forta-agent-tools/lib/test";
+import { createAddress } from "forta-agent-tools";
 import LRU from "lru-cache";
 import { BigNumber, ethers, utils } from "ethers";
 import { UNISWAP_V3_POOL_ABI, V3_FACTORY_CONTRACT_ADDRESS } from "./constants";
 import { createSwapFinding } from "./utils";
 
 const TEST_DATA = {
-  from: "0x42e7b1e1aecdd9262e6b5f07dcadb7a9beace7ef",
-  to: "0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45",
+  from: createAddress("0x41"),
+  to: createAddress("0x42"),
   poolAddress: "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
-  sender: "0xBEEFBaBEeA323F07c59926295205d3b7a17E8638",
-  recipient: "0xBEEFBaBEeA323F07c59926295205d3b7a17E8638",
+  sender: createAddress("0x43"),
+  recipient: createAddress("0x43"),
   token0: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
   token1: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
   fee: "500",
@@ -85,12 +86,12 @@ describe("UNISWAP BOT TEST", () => {
   });
 
   it("Returns empty finding if swap is not a valid pool", async () => {
-    setPool("0x45c54210128a065de780C4B0Df3d16664f7f859e", TEST_DATA.token0, TEST_DATA.token1, TEST_DATA.fee, 0);
+    setPool(createAddress("0x45"), TEST_DATA.token0, TEST_DATA.token1, TEST_DATA.fee, 0);
     setProviderBlock(0);
     const mockTxEvent = new TestTransactionEvent()
       .setFrom(TEST_DATA.from)
       .setTo(TEST_DATA.to)
-      .addEventLog(UNISWAP_V3_POOL_ABI[0], "0x45c54210128a065de780C4B0Df3d16664f7f859e", [
+      .addEventLog(UNISWAP_V3_POOL_ABI[0], createAddress("0x45"), [
         TEST_DATA.sender,
         TEST_DATA.recipient,
         TEST_DATA.amount0,
@@ -110,9 +111,7 @@ describe("UNISWAP BOT TEST", () => {
     const mockTxEvent = new TestTransactionEvent()
       .setFrom(TEST_DATA.from)
       .setTo(TEST_DATA.to)
-      .addEventLog("event Custom(address addr)", "0x45c54210128a065de780C4B0Df3d16664f7f859e", [
-        "0xBEEFBaBEeA323F07c59926295205d3b7a17E8638",
-      ])
+      .addEventLog("event Custom(address addr)", createAddress("0x45"), [createAddress("0x46")])
       .setBlock(0);
     const findings = await handleTransaction(mockTxEvent);
     expect([]).toStrictEqual(findings);
