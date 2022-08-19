@@ -1,10 +1,5 @@
 import { ethers } from "ethers";
-import {
-  Finding,
-  HandleTransaction,
-  TransactionEvent,
-  getEthersProvider,
-} from "forta-agent";
+import { Finding, HandleTransaction, TransactionEvent, getEthersProvider } from "forta-agent";
 import {
   ARBITRUM_ESCROW,
   ARBITRUM_RPC_URL,
@@ -32,12 +27,12 @@ export function provideHandleTransaction(args: HandlerArgs): HandleTransaction {
           args.arbitrumEscrow,
           args.cache
         );
-        if (l1balance.gt(l2totalSupply)) {
+        if (l1balance.lt(l2totalSupply)) {
           findings.push(
             createFinding({
               source,
               destination,
-              amount,
+              amount: amount.toString(),
               l1Balance: l1balance.toString(),
               l2TotalSupply: l2totalSupply.toString(),
               chain: "arbitrum",
@@ -54,7 +49,7 @@ export function provideHandleTransaction(args: HandlerArgs): HandleTransaction {
           args.optimismEscrow,
           args.cache
         );
-        if (l1balance.gt(l2totalSupply)) {
+        if (l1balance.lt(l2totalSupply)) {
           findings.push(
             createFinding({
               source,
