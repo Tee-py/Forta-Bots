@@ -18,7 +18,7 @@ export function provideHandleTransaction(args: HandlerArgs): HandleTransaction {
     const transferEvents = txEvent.filterLog(TRANSFER_EVENT);
     for (const call of transferEvents) {
       const [source, destination, amount] = call.args;
-      if (destination.toString() === args.arbitrumEscrow) {
+      if (destination === args.arbitrumEscrow) {
         const [l1balance, l2totalSupply] = await getBalanceAndTotalSupply(
           args.l1Provider,
           args.arbitrumProvider,
