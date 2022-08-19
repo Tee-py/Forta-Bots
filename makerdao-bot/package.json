@@ -1,7 +1,8 @@
 {
-  "name": "forta-agent-starter",
+  "name": "makerdao-dai-bridge-bot",
   "version": "0.0.1",
-  "description": "Forta Agent Typescript starter project",
+  "description": "Forta bot that detects when total supply of DAI on optimism or arbitrum exceeds the DAI balace of their escrow.",
+  "repository": "https://github.com/Tee-py/Forta-Bots/tree/makedao-bot/makerdao-bot",
   "chainIds": [
     1
   ],
