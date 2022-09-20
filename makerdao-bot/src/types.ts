@@ -3,21 +3,30 @@ import LRU from "lru-cache";
 
 export type Provider = ethers.providers.JsonRpcProvider;
 export type HandlerArgs = {
-  arbitrumProvider: Provider;
-  optimismProvider: Provider;
-  l1Provider: Provider;
+  provider: Provider;
   l1Dai: string;
   l2Dai: string;
   arbitrumEscrow: string;
   optimismEscrow: string;
+  arbitrumL1Gateway: string;
+  L2Bridge: string;
+  arbitrumBotId: string;
+  optimismBotId: string;
+  arbitrumChainId: number;
+  optimismChainId: number;
   cache: LRU<string, BigNumber>;
 };
 
-export type MetaData = {
-  source: string;
+export type L2MetaData = {
   destination: string;
   amount: string;
-  l1Balance: string;
-  l2TotalSupply: string;
+  totalSupply: string;
+  chainId: string;
+  chain: string;
+};
+
+export type ViolationMetaData = {
+  balance: string;
+  totalSupply: string;
   chain: string;
 };

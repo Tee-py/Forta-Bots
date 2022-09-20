@@ -4,7 +4,9 @@
   "description": "Forta bot that detects when total supply of DAI on optimism or arbitrum exceeds the DAI balace of their escrow.",
   "repository": "https://github.com/Tee-py/Forta-Bots/tree/makedao-bot/makerdao-bot",
   "chainIds": [
-    1
+    1,
+    42161,
+    10
   ],
   "scripts": {
     "build": "tsc",
@@ -26,6 +28,7 @@
     "format": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
+    "axios": "^0.27.2",
     "forta-agent": "^0.1.9",
     "lru-cache": "^7.14.0"
   },
